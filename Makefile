@@ -6,8 +6,13 @@
 #Should there be a file named 'up' -> use '.PHONY: up' instead, or everything listed here
 .PHONY: up kafka db
 
-up:
-	docker compose up kafka postgres
+all:
+	@docker info >/dev/null 2>&1 || docker desktop start
+	docker compose up kafka postgres grafana prometheus
+
+monitor:
+	@docker info >/dev/null 2>&1 || docker desktop start
+	docker compose up grafana prometheus
 
 down:
 	docker compose down
