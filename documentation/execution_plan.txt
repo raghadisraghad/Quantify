@@ -1,0 +1,14 @@
+Execution plan
+- Services (Business Logic) with Kafka  ❌
+- Postman/Swagger/Unit testing (testing)❌
+- Eureka                                ❌
+- API Gateway                           ❌
+- Frontend                              ❌
+- Redis Cache                           ❌
+- Prometheus                            ❌
+- Grafana                               ❌
+- AI Service                            ❌
+
+ ✅ ❌
+
+ (temp file)
