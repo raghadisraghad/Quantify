@@ -1,0 +1,21 @@
+# build
+bin/
+obj/
+
+# user/local
+*.user
+*.suo
+
+# env files
+.env
+
+# logs
+*.log
+
+# IDE
+.vs/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
