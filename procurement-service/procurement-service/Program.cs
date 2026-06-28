@@ -1,13 +1,13 @@
-using inventory_service;
 using Microsoft.EntityFrameworkCore;
-using System;
+using inventory_service;
+using Steeltoe.Discovery.Eureka;
 
 DotNetEnv.Env.Load();
 
 var connString =
     $"Host={Environment.GetEnvironmentVariable("DB_HOST")};" +
     $"Port={Environment.GetEnvironmentVariable("DB_PORT")};" +
-    $"Database=quantify;" +
+    $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
     $"Username={Environment.GetEnvironmentVariable("DB_USER")};" +
     $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")}";
 
@@ -23,6 +23,9 @@ using (var scope = builder.Services.BuildServiceProvider().CreateScope())
     Console.WriteLine("DB CONNECTED");
 }
 
+builder.Services.AddEurekaDiscoveryClient();
+builder.Services.AddControllers();
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -31,6 +34,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseAuthorization();
+app.MapControllers();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
