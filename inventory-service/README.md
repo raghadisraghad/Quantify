@@ -90,58 +90,60 @@ http://localhost:8083/swagger
 
 ## Classes Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
 class Ingredient {
-  +id : String [PK]
-  +businessId : String [FK]
-  +name : String
-  +picture : String
-  +unit : String
-  +costPerUnit : Decimal
-  +currentQuantity : Decimal
-  +minThreshold : Decimal
+    +String id [PK]
+    +String businessId [FK]
+    +String name
+    +String picture
+    +String unit
+    +Decimal costPerUnit
+    +Decimal currentQuantity
+    +Decimal minThreshold
 }
 
 class Recipe {
-  +id : String [PK]
-  +businessId : String [FK]
-  +name : String
-  +picture : String
-  +categoryId : String [FK]
-  +price : Decimal
-  +status : RecipeStatus
+    +String id [PK]
+    +String businessId [FK]
+    +String name
+    +String picture
+    +String categoryId [FK]
+    +Decimal price
+    +RecipeStatus status
 }
 
 class Category {
-  +id : String [PK]
-  +businessId : String [FK]
-  +name : String
+    +String id [PK]
+    +String businessId [FK]
+    +String name
 }
 
 class RecipeItem {
-  +recipeId : String [PK, FK]
-  +ingredientId : String [PK, FK]
-  +quantity : Decimal
+    +String recipeId [PK, FK]
+    +String ingredientId [PK, FK]
+    +Decimal quantity
 }
 
 class StockMovement {
-  +id : String [PK]
-  +type : MovementType
-  +quantity : Decimal
-  +date : LocalDateTime
-  +ingredientId : String [FK]
+    +String id [PK]
+    +MovementType type
+    +Decimal quantity
+    +LocalDateTime date
+    +String ingredientId [FK]
 }
 
-enum RecipeStatus {
-  ACTIVE
-  INACTIVE
+class RecipeStatus {
+    <<enumeration>>
+    ACTIVE
+    INACTIVE
 }
 
-enum MovementType {
-  IN
-  OUT
+class MovementType {
+    <<enumeration>>
+    IN
+    OUT
 }
 
 Category "1" --> "*" Recipe
@@ -149,13 +151,14 @@ Recipe "1" --> "*" RecipeItem
 Ingredient "1" --> "*" RecipeItem
 Ingredient "1" --> "*" StockMovement
 
-@enduml
+Recipe --> RecipeStatus
+StockMovement --> MovementType
 ```
 
 ### Notes
 
-* `RecipeStatus`: `ACTIVE`, `INACTIVE`
-* `MovementType`: `IN`, `OUT`
-* Each business manages its own ingredients, recipes, and categories through `businessId`.
-* Stock movements track inventory increases and decreases.
-* Recipes are composed of one or more ingredients through `RecipeItem`.
+- `RecipeStatus`: `ACTIVE`, `INACTIVE`
+- `MovementType`: `IN`, `OUT`
+- Each business manages its own ingredients, recipes, and categories through `businessId`.
+- Stock movements track inventory increases and decreases.
+- Recipes are composed of one or more ingredients through `RecipeItem`.

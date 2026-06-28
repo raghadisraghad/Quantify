@@ -69,44 +69,47 @@ java -jar target/user-service-25.jar
 
 ## Classes Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
 class Business {
-  +id : String [PK]
-  +name : String
-  +ownerEmail : String
-  +passwordHash : String
-  +type : BusinessType
-  +isActive : Boolean
-  +createdAt : LocalDateTime
+    +String id [PK]
+    +String name
+    +String ownerEmail
+    +String passwordHash
+    +BusinessType type
+    +Boolean isActive
+    +LocalDateTime createdAt
 }
 
 class User {
-  +id : String [PK]
-  +businessId : String [FK]
-  +name : String
-  +pinCodeHash : String
-  +role : UserRole
-  +isActive : Boolean
-  +createdAt : LocalDateTime
+    +String id [PK]
+    +String businessId [FK]
+    +String name
+    +String pinCodeHash
+    +UserRole role
+    +Boolean isActive
+    +LocalDateTime createdAt
 }
 
-enum BusinessType {
-  RESTAURANT
-  BAKERY
-  CAFE
+class BusinessType {
+    <<enumeration>>
+    RESTAURANT
+    BAKERY
+    CAFE
 }
 
-enum UserRole {
-  OWNER
-  MANAGER
-  CASHIER
+class UserRole {
+    <<enumeration>>
+    OWNER
+    MANAGER
+    CASHIER
 }
 
-Business "1" --> "*" User : owns >
+Business "1" --> "*" User : owns
 
-@enduml
+Business --> BusinessType
+User --> UserRole
 ```
 
 ### Notes
