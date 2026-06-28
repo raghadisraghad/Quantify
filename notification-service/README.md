@@ -84,45 +84,50 @@ npm run test
 
 ## Classes Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
 class Notification {
-  +id : String [PK]
-  +businessId : String [FK]
-  +targetRole : UserRole [OPT]
-  +title : String
-  +message : String
-  +channel : NotificationChannel
-  +status : NotificationStatus
-  +createdAt : LocalDateTime
+    +String id [PK]
+    +String businessId [FK]
+    +UserRole targetRole [OPT]
+    +String title
+    +String message
+    +NotificationChannel channel
+    +NotificationStatus status
+    +LocalDateTime createdAt
 }
 
-enum NotificationChannel {
-  IN_APP
-  EMAIL
+class NotificationChannel {
+    <<enumeration>>
+    IN_APP
+    EMAIL
 }
 
-enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
+class NotificationStatus {
+    <<enumeration>>
+    PENDING
+    SENT
+    FAILED
 }
 
-enum UserRole {
-  ALL
-  OWNER
-  MANAGER
-  CASHIER
+class UserRole {
+    <<enumeration>>
+    ALL
+    OWNER
+    MANAGER
+    CASHIER
 }
 
-@enduml
+Notification --> NotificationChannel
+Notification --> NotificationStatus
+Notification --> UserRole
 ```
 
 ### Notes
 
-* `NotificationChannel`: `IN_APP`, `EMAIL`
-* `NotificationStatus`: `PENDING`, `SENT`, `FAILED`
-* `targetRole` allows notifications to be sent to all users or a specific role.
-* `businessId` ensures notifications are isolated per business tenant.
-* Notifications can be delivered through in-app messages or email.
+- `NotificationChannel`: `IN_APP`, `EMAIL`
+- `NotificationStatus`: `PENDING`, `SENT`, `FAILED`
+- `targetRole` allows notifications to be sent to all users or a specific role.
+- `businessId` ensures notifications are isolated per business tenant.
+- Notifications can be delivered through in-app messages or email.

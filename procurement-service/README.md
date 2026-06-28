@@ -81,50 +81,50 @@ dotnet ./bin/Release/net8.0/ProcurementService.dll
 
 ## Classes Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
 class Supplier {
-  +id : String [PK]
-  +businessId : String [FK]
-  +name : String
-  +contactName : String
-  +email : String
-  +phone : String
-  +isActive : Boolean
-  +createdAt : LocalDateTime
+    +String id [PK]
+    +String businessId [FK]
+    +String name
+    +String contactName
+    +String email
+    +String phone
+    +Boolean isActive
+    +LocalDateTime createdAt
 }
 
 class PurchaseOrder {
-  +id : String [PK]
-  +businessId : String [FK]
-  +supplierId : String [FK]
-  +status : POStatus
-  +totalCostMAD : Decimal
-  +orderedAt : LocalDateTime
-  +receivedAt : LocalDateTime
-  +notes : String
+    +String id [PK]
+    +String businessId [FK]
+    +String supplierId [FK]
+    +POStatus status
+    +Decimal totalCostMAD
+    +LocalDateTime orderedAt
+    +LocalDateTime receivedAt
+    +String notes
 }
 
 class PurchaseOrderItem {
-  +id : String [PK]
-  +purchaseOrderId : String [FK]
-  +ingredientId : String
-  +quantityOrdered : Decimal
-  +unitPriceCost : Decimal
+    +String id [PK]
+    +String purchaseOrderId [FK]
+    +String ingredientId
+    +Decimal quantityOrdered
+    +Decimal unitPriceCost
 }
 
-enum POStatus {
-  DRAFT
-  SENT
-  RECEIVED
-  CANCELLED
+class POStatus {
+    <<enumeration>>
+    DRAFT
+    SENT
+    RECEIVED
+    CANCELLED
 }
 
-Supplier "1" --> "*" PurchaseOrder : supplies >
-PurchaseOrder "1" --> "*" PurchaseOrderItem : contains >
-
-@enduml
+Supplier "1" --> "*" PurchaseOrder : supplies
+PurchaseOrder "1" --> "*" PurchaseOrderItem : contains
+PurchaseOrder --> POStatus
 ```
 
 ### Notes

@@ -78,65 +78,70 @@ http://localhost:8084/swagger-ui/index.html
 
 ## Classes Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
 class Order {
-  +id : String [PK]
-  +businessId : String [FK]
-  +orderNumber : String
-  +totalAmount : Decimal
-  +status : OrderStatus
-  +createdAt : LocalDateTime
+    +String id [PK]
+    +String businessId [FK]
+    +String orderNumber
+    +Decimal totalAmount
+    +OrderStatus status
+    +LocalDateTime createdAt
 }
 
 class OrderItem {
-  +id : String [PK]
-  +orderId : String [FK]
-  +recipeId : String
-  +quantity : Integer
-  +unitPrice : Decimal
+    +String id [PK]
+    +String orderId [FK]
+    +String recipeId
+    +Integer quantity
+    +Decimal unitPrice
 }
 
 class Payment {
-  +id : String [PK]
-  +businessId : String [FK]
-  +orderId : String [FK]
-  +amount : Decimal
-  +tenderedAmount : Decimal
-  +changeAmount : Decimal
-  +paymentMethod : PaymentMethod
-  +status : PaymentStatus
-  +transactionDate : LocalDateTime
+    +String id [PK]
+    +String businessId [FK]
+    +String orderId [FK]
+    +Decimal amount
+    +Decimal tenderedAmount
+    +Decimal changeAmount
+    +PaymentMethod paymentMethod
+    +PaymentStatus status
+    +LocalDateTime transactionDate
 }
 
-enum OrderStatus {
-  PENDING
-  PAID
-  CANCELLED
+class OrderStatus {
+    <<enumeration>>
+    PENDING
+    PAID
+    CANCELLED
 }
 
-enum PaymentStatus {
-  SUCCESS
-  FAILED
+class PaymentStatus {
+    <<enumeration>>
+    SUCCESS
+    FAILED
 }
 
-enum PaymentMethod {
-  CASH
-  CARD
+class PaymentMethod {
+    <<enumeration>>
+    CASH
+    CARD
 }
 
-Order "1" --> "*" OrderItem : contains >
-Order "1" --> "1" Payment : settled by >
+Order "1" --> "*" OrderItem : contains
+Order "1" --> "1" Payment : settled by
 
-@enduml
+Order --> OrderStatus
+Payment --> PaymentStatus
+Payment --> PaymentMethod
 ```
 
 ### Notes
 
-* `OrderStatus`: `PENDING`, `PAID`, `CANCELLED`
-* `PaymentStatus`: `SUCCESS`, `FAILED`
-* `PaymentMethod`: `CASH`, `CARD`
-* Each business manages its own orders and payments through `businessId`.
-* `unitPrice` stores the recipe price at the moment of sale.
-* `Payment` records the final transaction associated with an order.
+- `OrderStatus`: `PENDING`, `PAID`, `CANCELLED`
+- `PaymentStatus`: `SUCCESS`, `FAILED`
+- `PaymentMethod`: `CASH`, `CARD`
+- Each business manages its own orders and payments through `businessId`.
+- `unitPrice` stores the recipe price at the moment of sale.
+- `Payment` records the final transaction associated with an order.
