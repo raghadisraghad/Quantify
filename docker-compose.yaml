@@ -66,3 +66,102 @@ services:
     #environment:
     #  - GF_SECURITY_ADMIN_USER=admin
     #  - GF_SECURITY_ADMIN_PASSWORD=password
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      - inventory-service-db
+      - kafka
+      - discovery-service
+    networks:
+      - microservices-network
+    ports:
+      - "8083:8083"
+    environment:
+      SERVER_PORT: 8083
+
+      DB_HOST: inventory-service-db
+      DB_PORT: 5432
+      DB_NAME: inventory_service_db
+      DB_USERNAME: admin
+      DB_PASSWORD: password
+
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8081
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  procurement-service:
+    build: ./procurement-service
+    container_name: procurement-service
+    depends_on:
+      - procurement-service-db
+      - kafka
+      - discovery-service
+    networks:
+      - microservices-network
+    ports:
+      - "8084:8084"
+    environment:
+      SERVER_PORT: 8084
+
+      DB_HOST: procurement-service-db
+      DB_PORT: 5432
+      DB_NAME: procurement_service_db
+      DB_USERNAME: admin
+      DB_PASSWORD: password
+
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8081
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  sales-service:
+    build: ./sales-service
+    container_name: sales-service
+    depends_on:
+      - sales-service-db
+      - kafka
+      - discovery-service
+    networks:
+      - microservices-network
+    ports:
+      - "8085:8085"
+    environment:
+      SERVER_PORT: 8085
+
+      DB_HOST: sales-service-db
+      DB_PORT: 5432
+      DB_NAME: sales_service_db
+      DB_USERNAME: admin
+      DB_PASSWORD: password
+
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8081
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - kafka
+      - discovery-service
+    networks:
+      - microservices-network
+    ports:
+      - "8086:8086"
+    environment:
+      SERVER_PORT: 8086
+
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8081
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+volumes:
+  user-service-db-data:
+  inventory-service-db-data:
+  procurement-service-db-data:
+  sales-service-db-data:
