@@ -67,6 +67,72 @@ services:
     #  - GF_SECURITY_ADMIN_USER=admin
     #  - GF_SECURITY_ADMIN_PASSWORD=password
 
+  user-service-db:
+    image: postgres:17
+    container_name: user-service-db
+    environment:
+      POSTGRES_DB: user_service_db # always use underscore for this part
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - user-service-db-data:/var/lib/postgresql/data 
+      # this means that the path to user-service-db-data is /var/lib/postgresql/data
+      # so all db services will have same path, just different name like inventory-service-db-data ..
+
+  api-gateway-service:
+    build: ./api-gateway-service
+    container_name: api-gateway-service
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-network
+
+  discovery-service:
+    build: ./discovery-service
+    container_name: discovery-service
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-network
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      - user-service-db
+      - kafka
+      - discovery-service
+    networks:
+      - microservices-network
+    ports:
+      - "8082:8082"
+    environment: 
+      SERVER_PORT: 8082
+
+      DB_HOST: user-service-db
+      DB_PORT: 5432
+      DB_NAME: user_service_db
+      DB_USERNAME: admin
+      DB_PASSWORD: password
+
+      EUREKA_HOST: discovery-service
+      EUREKA_PORT: 8081
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    depends_on:
+      - user-service
+      - api-gateway-service
+    networks:
+      - microservices-network
+    ports:
+      - "4200:80"
+
   inventory-service:
     build: ./inventory-service
     container_name: inventory-service
