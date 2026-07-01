@@ -1,22 +1,18 @@
-# Build stage using official Temurin JDK 25
-FROM eclipse-temurin:25-jdk AS builder
+# Build Angular
+FROM node:22 AS builder
 
 WORKDIR /app
 
-# Install Maven manually
-RUN apt-get update && apt-get install -y maven
+COPY package*.json ./
+RUN npm install
 
-COPY pom.xml .
-COPY src ./src
+COPY . .
 
-RUN mvn clean package -DskipTests
+RUN npm run build
 
-# Runtime stage using Temurin JRE 25
-FROM eclipse-temurin:25-jre
-WORKDIR /app
+# Serve with nginx
+FROM nginx:alpine
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 80
