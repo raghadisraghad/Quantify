@@ -10,6 +10,7 @@ This service is built with Spring Boot and JDK 25.
 - [Building](#building)
 - [Running the JAR](#running-the-jar)
 - [Classes Diagram](#classes-diagram)
+* [Database Schema ERD](#database-schema-erd)
 
 ## Environment File
 
@@ -118,3 +119,34 @@ User --> UserRole
 - `UserRole`: `OWNER`, `MANAGER`, `CASHIER`
 - Each `Business` can have multiple `User` accounts.
 - Users belong to a single business tenant.
+- `(+)` : `Public method`
+- `(-)` : `Private method`
+- `(#)` : `Protected method`
+- `(~)` : `Package/Internal method`
+
+## Database Schema ERD
+
+```mermaid
+erDiagram
+    BUSINESS ||--o{ USER : "owns"
+
+    BUSINESS {
+        string id PK
+        string name
+        string ownerEmail
+        string passwordHash
+        string type
+        boolean isActive
+        datetime createdAt
+    }
+
+    USER {
+        string id PK
+        string businessId FK
+        string name
+        string pinCodeHash
+        string role
+        boolean isActive
+        datetime createdAt
+    }
+```
