@@ -6,9 +6,6 @@ obj/
 *.user
 *.suo
 
-# env files
-.env
-
 # logs
 *.log
 
@@ -19,3 +16,8 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment
+#.env
+#.env.*
+#!.env.example
