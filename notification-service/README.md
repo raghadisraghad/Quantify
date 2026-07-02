@@ -11,6 +11,7 @@ This service is built with NestJS.
 * [Running the Application](#running-the-application)
 * [Unit Testing](#unit-testing)
 * [Classes Diagram](#classes-diagram)
+* [Database Schema ERD](#database-schema-erd)
 
 ## Environment File
 
@@ -131,3 +132,23 @@ Notification --> UserRole
 - `targetRole` allows notifications to be sent to all users or a specific role.
 - `businessId` ensures notifications are isolated per business tenant.
 - Notifications can be delivered through in-app messages or email.
+- `(+)` : `Public method`
+- `(-)` : `Private method`
+- `(#)` : `Protected method`
+- `(~)` : `Package/Internal method`
+
+## Database Schema ERD
+
+```mermaid
+erDiagram
+    NOTIFICATION {
+        string id PK
+        string businessId FK
+        string targetRole
+        string title
+        string message
+        string channel
+        string status
+        datetime createdAt
+    }
+```

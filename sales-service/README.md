@@ -11,6 +11,7 @@ This service is built with Spring Boot and JDK 25.
 * [Running the JAR](#running-the-jar)
 * [API Documentation](#api-documentation)
 * [Classes Diagram](#classes-diagram)
+* [Database Schema ERD](#database-schema-erd)
 
 ## Environment File
 
@@ -145,3 +146,44 @@ Payment --> PaymentMethod
 - Each business manages its own orders and payments through `businessId`.
 - `unitPrice` stores the recipe price at the moment of sale.
 - `Payment` records the final transaction associated with an order.
+- `(+)` : `Public method`
+- `(-)` : `Private method`
+- `(#)` : `Protected method`
+- `(~)` : `Package/Internal method`
+
+## Database Schema ERD
+
+```mermaid
+erDiagram
+    ORDER ||--o{ ORDER_ITEM : "contains"
+    ORDER ||--|| PAYMENT : "settled by"
+
+    ORDER {
+        string id PK
+        string businessId FK
+        string orderNumber
+        decimal totalAmount
+        string status
+        datetime createdAt
+    }
+
+    ORDER_ITEM {
+        string id PK
+        string orderId FK
+        string recipeId
+        integer quantity
+        decimal unitPrice
+    }
+
+    PAYMENT {
+        string id PK
+        string businessId FK
+        string orderId FK
+        decimal amount
+        decimal tenderedAmount
+        decimal changeAmount
+        string paymentMethod
+        string status
+        datetime transactionDate
+    }
+```
