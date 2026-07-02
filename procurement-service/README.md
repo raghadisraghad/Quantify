@@ -10,6 +10,7 @@ This service is built with ASP.NET Core Web API 8.0.
 - [Building](#building)
 - [Running the Application](#running-the-application)
 - [Classes Diagram](#classes-diagram)
+* [Database Schema ERD](#database-schema-erd)
 
 ## Environment File
 
@@ -134,3 +135,45 @@ PurchaseOrder --> POStatus
 - Each `PurchaseOrder` can contain multiple items.
 - `businessId` is used to enforce tenant isolation between businesses.
 - Receiving a purchase order may trigger inventory stock updates.
+- `(+)` : `Public method`
+- `(-)` : `Private method`
+- `(#)` : `Protected method`
+- `(~)` : `Package/Internal method`
+
+## Database Schema ERD
+
+```mermaid
+erDiagram
+    SUPPLIER ||--o{ PURCHASE_ORDER : "supplies"
+    PURCHASE_ORDER ||--o{ PURCHASE_ORDER_ITEM : "contains"
+
+    SUPPLIER {
+        string id PK
+        string businessId FK
+        string name
+        string contactName
+        string email
+        string phone
+        boolean isActive
+        datetime createdAt
+    }
+
+    PURCHASE_ORDER {
+        string id PK
+        string businessId FK
+        string supplierId FK
+        string status
+        decimal totalCostMAD
+        datetime orderedAt
+        datetime receivedAt
+        string notes
+    }
+
+    PURCHASE_ORDER_ITEM {
+        string id PK
+        string purchaseOrderId FK
+        string ingredientId
+        decimal quantityOrdered
+        decimal unitPriceCost
+    }
+```
