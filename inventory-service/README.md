@@ -11,6 +11,7 @@ This service is built with ASP.NET Core Web API 8.0.
 * [Running the Application](#running-the-application)
 * [API Documentation](#api-documentation)
 * [Classes Diagram](#classes-diagram)
+* [Database Schema ERD](#database-schema-erd)
 
 ## Environment File
 
@@ -162,3 +163,58 @@ StockMovement --> MovementType
 - Each business manages its own ingredients, recipes, and categories through `businessId`.
 - Stock movements track inventory increases and decreases.
 - Recipes are composed of one or more ingredients through `RecipeItem`.
+- `(+)` : `Public method`
+- `(-)` : `Private method`
+- `(#)` : `Protected method`
+- `(~)` : `Package/Internal method`
+
+## Database Schema ERD
+
+```mermaid
+erDiagram
+    CATEGORY ||--o{ RECIPE : "has"
+    RECIPE ||--o{ RECIPE_ITEM : "contains"
+    INGREDIENT ||--o{ RECIPE_ITEM : "used in"
+    INGREDIENT ||--o{ STOCK_MOVEMENT : "tracks"
+
+    CATEGORY {
+        string id
+        string businessId
+        string name
+    }
+
+    RECIPE {
+        string id
+        string businessId
+        string name
+        string picture
+        string categoryId
+        decimal price
+        string status
+    }
+
+    INGREDIENT {
+        string id
+        string businessId
+        string name
+        string picture
+        string unit
+        decimal costPerUnit
+        decimal currentQuantity
+        decimal minThreshold
+    }
+
+    RECIPE_ITEM {
+        string recipeId
+        string ingredientId
+        decimal quantity
+    }
+
+    STOCK_MOVEMENT {
+        string id
+        string type
+        decimal quantity
+        datetime date
+        string ingredientId
+    }
+```
