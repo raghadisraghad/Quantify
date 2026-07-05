@@ -34,17 +34,6 @@ services:
       POSTGRES_PASSWORD:  password
       POSTGRES_DB:        default_database # The PostgreSQL default database (automatically created at first launch)
 
-    ####
-    ## If you want to use a `.env` file, please comment the `environment` section.
-    ####
-
-    # The `env_file` tag allows us to declare an environment file
-    #env_file:
-    #  - .env # The name of your environment file (the one at the repository root)
-
-    #volumes:
-    #  - ./db-data/:/var/lib/postgresql/data/
-
   prometheus:
     image: prom/prometheus:main
     #volumes:
@@ -75,14 +64,50 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - "5437:5432"
     volumes:
       - user-service-db-data:/var/lib/postgresql/data 
       # this means that the path to user-service-db-data is /var/lib/postgresql/data
       # so all db services will have same path, just different name like inventory-service-db-data ..
 
+  inventory-service-db:
+    image: postgres:17
+    container_name: inventory-service-db
+    environment:
+      POSTGRES_DB: inventory_service_db # always use underscore for this part
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - inventory-service-db-data:/var/lib/postgresql/data
+
+  sales-service-db:
+    image: postgres:17
+    container_name: sales-service-db
+    environment:
+      POSTGRES_DB: sales_service_db # always use underscore for this part
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    volumes:
+      - sales-service-db-data:/var/lib/postgresql/data
+
+  procurement-service-db:
+    image: postgres:17
+    container_name: procurement-service-db
+    environment:
+      POSTGRES_DB: procurement_service_db # always use underscore for this part
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+    volumes:
+      - procurement-service-db-data:/var/lib/postgresql/data
+
   api-gateway-service:
-    build: ./api-gateway-service
+    build: ./api_gateway_service
     container_name: api-gateway-service
     ports:
       - "8080:8080"
@@ -90,12 +115,23 @@ services:
       - microservices-network
 
   discovery-service:
-    build: ./discovery-service
+    build: ./discovery_service
     container_name: discovery-service
     ports:
       - "8081:8081"
     networks:
       - microservices-network
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    depends_on:
+      - user-service
+      - api-gateway-service
+    networks:
+      - microservices-network
+    ports:
+      - "4200:80"
 
   user-service:
     build: ./user-service
@@ -121,17 +157,6 @@ services:
       EUREKA_PORT: 8081
 
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    depends_on:
-      - user-service
-      - api-gateway-service
-    networks:
-      - microservices-network
-    ports:
-      - "4200:80"
 
   inventory-service:
     build: ./inventory-service

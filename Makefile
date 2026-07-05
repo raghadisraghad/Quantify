@@ -18,13 +18,12 @@ down:
 	docker compose down
 	docker ps
 
-kafka:
-	docker compose up kafka
-
-db:
-	docker compose up postgres
-
-net:
-	docker network list
+env:
+	powershell -Command "Copy-Item user-service/.env.example user-service/.env"
+	powershell -Command "Copy-Item sales-service/.env.example sales-service/.env"
+	powershell -Command "Copy-Item notification-service/.env.example notification-service/.env"
+	powershell -Command "Copy-Item frontend/.env.example frontend/.env"
+	powershell -Command "Copy-Item discovery_service/.env.example discovery_service/.env"
+	powershell -Command "Copy-Item api_gateway_service/.env.example api_gateway_service/.env"
 
 # makefile:XX: *** missing separator. ---> this means you should copy paste Tab space from one of the existing commands and apply to XX line

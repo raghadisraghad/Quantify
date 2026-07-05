@@ -1,22 +1,22 @@
-# Build stage using official Temurin JDK 25
-FROM eclipse-temurin:25-jdk AS builder
+FROM node:22 AS builder
 
 WORKDIR /app
 
-# Install Maven manually
-RUN apt-get update && apt-get install -y maven
+COPY package*.json ./
+RUN npm ci
 
-COPY pom.xml .
-COPY src ./src
+COPY . .
+RUN npm run build
 
-RUN mvn clean package -DskipTests
+FROM node:22
 
-# Runtime stage using Temurin JRE 25
-FROM eclipse-temurin:25-jre
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar app.jar
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-EXPOSE 8080
+COPY --from=builder /app/dist ./dist
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+EXPOSE 8086
+
+CMD ["node", "dist/main.js"]
