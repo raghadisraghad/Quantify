@@ -1,12 +1,17 @@
 package com.quantify.userservice.services;
 
+import com.quantify.userservice.DTOs.*;
+import com.quantify.userservice.mappers.BusinessMapper;
 import com.quantify.userservice.models.Business;
+import com.quantify.userservice.models.UserRole;
 import com.quantify.userservice.repositories.BusinessRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -14,48 +19,69 @@ import java.util.List;
 public class BusinessServiceImpl implements BusinessService {
 
     private final BusinessRepository businessRepository;
+    private final UserServiceImpl userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Business createBusiness(Business business) {
-        return businessRepository.save(business);
+    public Business createBusiness(CreateBusinessRequest businessRequest) {
+
+        Business business = Business.builder().name(businessRequest.getName()).ownerEmail(businessRequest.getOwnerEmail()).passwordHash(passwordEncoder.encode(businessRequest.getPassword())).type(businessRequest.getType()).build();
+
+        business = businessRepository.save(business);
+
+        CreateUserRequest userRequest = CreateUserRequest.builder().businessId(business.getId()).name(businessRequest.getOwnerName()).role(UserRole.OWNER).build();
+
+        userService.createUser(userRequest);
+        return business;
     }
 
     @Override
-    public Business getBusinessById(String id) {
-        return businessRepository.findById(id).orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
+    public BusinessDTO getBusinessById(UUID id) {
+        return businessRepository.findById(id).map(BusinessMapper::toDto).orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
     }
 
     @Override
-    public List<Business> getAllBusinesses() {
-        return businessRepository.findAll();
+    public List<BusinessDTO> getAllBusinesses() {
+        return businessRepository.findAll().stream().map(BusinessMapper::toDto).toList();
     }
 
     @Override
-    public Business updateBusiness(String id, Business businessDetails) {
-        Business business = getBusinessById(id);
+    public BusinessDTO updateBusiness(UUID id, UpdateBusinessDto businessDetails) {
+        Business business = businessRepository.findById(id).orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
         business.setName(businessDetails.getName());
         business.setOwnerEmail(businessDetails.getOwnerEmail());
-        business.setPasswordHash(businessDetails.getPasswordHash());
         business.setType(businessDetails.getType());
-        business.setIsActive(businessDetails.getIsActive());
-        return businessRepository.save(business);
+        business.setName(businessDetails.getName());
+        return BusinessMapper.toDto(businessRepository.save(business));
     }
 
     @Override
-    public void deleteBusiness(String id) {
+    public void updateBusinessPassword(UUID businessId, UpdatePasswordDTO password) {
+        Business business = businessRepository.findById(businessId).orElseThrow(() -> new RuntimeException("Business not found with id: " + businessId));
+
+        if (!passwordEncoder.matches(password.getCurrentPasscode(), business.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        business.setPasswordHash(passwordEncoder.encode(password.getNewPasscode()));
+        businessRepository.save(business);
+    }
+
+    @Override
+    public void deleteBusiness(UUID id) {
         businessRepository.deleteById(id);
     }
 
     @Override
-    public void activateBusiness(String id) {
-        Business business = getBusinessById(id);
+    public void activateBusiness(UUID id) {
+        Business business = businessRepository.findById(id).orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
         business.setIsActive(true);
         businessRepository.save(business);
     }
 
     @Override
-    public void deactivateBusiness(String id) {
-        Business business = getBusinessById(id);
+    public void deactivateBusiness(UUID id) {
+        Business business = businessRepository.findById(id).orElseThrow(() -> new RuntimeException("Business not found with id: " + id));
         business.setIsActive(false);
         businessRepository.save(business);
     }
@@ -63,10 +89,5 @@ public class BusinessServiceImpl implements BusinessService {
     @Override
     public Business getBusinessByOwnerEmail(String ownerEmail) {
         return businessRepository.findByOwnerEmail(ownerEmail).orElseThrow(() -> new RuntimeException("Business not found with email: " + ownerEmail));
-    }
-
-    @Override
-    public boolean existsByOwnerEmail(String ownerEmail) {
-        return businessRepository.existsByOwnerEmail(ownerEmail);
     }
 }
