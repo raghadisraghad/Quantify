@@ -1,34 +1,34 @@
 package com.quantify.userservice.services;
 
+import com.quantify.userservice.DTOs.*;
 import com.quantify.userservice.models.User;
 import com.quantify.userservice.models.UserRole;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
-    User createUser(User user);
+    CreateUserResponse createUser(CreateUserRequest user);
 
-    User getUserById(String id);
+    UserDTO getUserById(UUID id);
 
-    User getUserByPin(String pin);
+    User getUserLogin(UserLoginRequest request);
 
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
 
-    List<User> getUsersByBusinessId(String businessId);
+    List<UserDTO> getUsersByBusinessId(UUID businessId);
 
-    List<User> getActiveUsersByBusinessId(String businessId);
+    List<UserDTO> getActiveUsersByBusinessId(UUID businessId);
 
-    List<User> getUsersByRole(UserRole role);
+    List<UserDTO> getUsersByRole(UserRole role);
 
-    List<User> getUsersByBusinessIdAndRole(String businessId, UserRole role);
+    UserDTO updateUser(UUID id, UpdateUserDto userDetails);
 
-    User updateUser(String id, User userDetails);
+    void updateUserPassword(UUID userId, UpdatePasswordDTO password);
 
-    void deleteUser(String id);
+    void deleteUser(UUID id);
 
-    void activateUser(String id);
+    void activateUser(UUID id);
 
-    void deactivateUser(String id);
-
-    boolean existsByBusinessIdAndName(String businessId, String name);
+    void deactivateUser(UUID id);
 }

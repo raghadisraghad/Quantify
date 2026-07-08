@@ -6,20 +6,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    List<User> findByBusinessId(String businessId);
+    List<User> findByBusinessId(UUID businessId);
 
-    List<User> findByBusinessIdAndIsActiveTrue(String businessId);
+    List<User> findByBusinessIdAndIsActiveTrue(UUID businessId);
 
     List<User> findByRole(UserRole role);
 
-    List<User> findByBusinessIdAndRole(String businessId, UserRole role);
-
-    boolean existsByBusinessIdAndName(String businessId, String name);
-
-    Optional<User> findByPinCodeHash(String pinCodeHash);
+    boolean existsByBusinessIdAndName(UUID businessId, String name);
 }

@@ -38,9 +38,12 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/health",
                                 "/api/users/login",
-                                "/api/businesses/login"
+                                "/api/users/register",
+                                "/api/businesses/login",
+                                "/api/businesses/register"
                         ).permitAll()
                         .anyRequest().authenticated()
+//                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter,

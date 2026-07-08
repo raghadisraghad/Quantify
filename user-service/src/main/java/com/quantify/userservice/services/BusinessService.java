@@ -1,25 +1,30 @@
 package com.quantify.userservice.services;
 
+import com.quantify.userservice.DTOs.BusinessDTO;
+import com.quantify.userservice.DTOs.CreateBusinessRequest;
+import com.quantify.userservice.DTOs.UpdateBusinessDto;
+import com.quantify.userservice.DTOs.UpdatePasswordDTO;
 import com.quantify.userservice.models.Business;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface BusinessService {
-    Business createBusiness(Business business);
+    Business createBusiness(CreateBusinessRequest businessRequest);
 
-    Business getBusinessById(String id);
+    BusinessDTO getBusinessById(UUID id);
 
-    List<Business> getAllBusinesses();
+    List<BusinessDTO> getAllBusinesses();
 
-    Business updateBusiness(String id, Business businessDetails);
+    BusinessDTO updateBusiness(UUID id, UpdateBusinessDto businessDetails);
 
-    void deleteBusiness(String id);
+    void updateBusinessPassword(UUID businessId, UpdatePasswordDTO password);
 
-    void activateBusiness(String id);
+    void deleteBusiness(UUID id);
 
-    void deactivateBusiness(String id);
+    void activateBusiness(UUID id);
+
+    void deactivateBusiness(UUID id);
 
     Business getBusinessByOwnerEmail(String ownerEmail);
-
-    boolean existsByOwnerEmail(String ownerEmail);
 }

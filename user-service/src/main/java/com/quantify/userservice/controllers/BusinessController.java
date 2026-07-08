@@ -1,6 +1,7 @@
 package com.quantify.userservice.controllers;
 
-import com.quantify.userservice.DTOs.LoginRequest;
+import com.quantify.userservice.DTOs.*;
+import com.quantify.userservice.mappers.BusinessMapper;
 import com.quantify.userservice.models.Business;
 import com.quantify.userservice.security.JwtService;
 import com.quantify.userservice.services.BusinessService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/businesses")
@@ -23,56 +25,52 @@ public class BusinessController {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    @PostMapping
-    public ResponseEntity<Business> createBusiness(@RequestBody Business business) {
-        return new ResponseEntity<>(businessService.createBusiness(business), HttpStatus.CREATED);
+    @PostMapping("/register")
+    public ResponseEntity<Business> createBusiness(@RequestBody CreateBusinessRequest businessRequest) {
+        return new ResponseEntity<>(businessService.createBusiness(businessRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Business> getBusinessById(@PathVariable String id) {
+    public ResponseEntity<BusinessDTO> getBusinessById(@PathVariable UUID id) {
         return ResponseEntity.ok(businessService.getBusinessById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<Business>> getAllBusinesses() {
+    public ResponseEntity<List<BusinessDTO>> getAllBusinesses() {
         return ResponseEntity.ok(businessService.getAllBusinesses());
     }
 
-    @GetMapping("/email/{ownerEmail}")
-    public ResponseEntity<Business> getBusinessByOwnerEmail(@PathVariable String ownerEmail) {
-        return ResponseEntity.ok(businessService.getBusinessByOwnerEmail(ownerEmail));
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<Business> updateBusiness(@PathVariable String id, @RequestBody Business business) {
+    public ResponseEntity<BusinessDTO> updateBusiness(@PathVariable UUID id, @RequestBody UpdateBusinessDto business) {
         return ResponseEntity.ok(businessService.updateBusiness(id, business));
     }
 
+    @PatchMapping("/{businessId}/password")
+    public ResponseEntity<Void> updateBusiness(@PathVariable UUID businessId, @RequestBody UpdatePasswordDTO password) {
+        businessService.updateBusinessPassword(businessId, password);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBusiness(@PathVariable String id) {
+    public ResponseEntity<Void> deleteBusiness(@PathVariable UUID id) {
         businessService.deleteBusiness(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activateBusiness(@PathVariable String id) {
+    public ResponseEntity<Void> activateBusiness(@PathVariable UUID id) {
         businessService.activateBusiness(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateBusiness(@PathVariable String id) {
+    public ResponseEntity<Void> deactivateBusiness(@PathVariable UUID id) {
         businessService.deactivateBusiness(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> existsByOwnerEmail(@RequestParam String ownerEmail) {
-        return ResponseEntity.ok(businessService.existsByOwnerEmail(ownerEmail));
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody BusinessLoginRequest request) {
         Business business = businessService.getBusinessByOwnerEmail(request.getEmail());
 
         if (business == null) {

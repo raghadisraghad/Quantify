@@ -1,6 +1,6 @@
 package com.quantify.userservice.controllers;
 
-import com.quantify.userservice.DTOs.LoginRequest;
+import com.quantify.userservice.DTOs.*;
 import com.quantify.userservice.models.User;
 import com.quantify.userservice.models.UserRole;
 import com.quantify.userservice.security.JwtService;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,75 +25,71 @@ public class UserController {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    @PostMapping("/register")
+    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest user) {
         return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<User>> getUsersByBusinessId(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.getUsersByBusinessId(userId));
+    @GetMapping("/business/{businessId}")
+    public ResponseEntity<List<UserDTO>> getUsersByBusinessId(@PathVariable UUID businessId) {
+        return ResponseEntity.ok(userService.getUsersByBusinessId(businessId));
     }
 
-    @GetMapping("/user/{userId}/active")
-    public ResponseEntity<List<User>> getActiveUsersByBusinessId(@PathVariable String userId) {
-        return ResponseEntity.ok(userService.getActiveUsersByBusinessId(userId));
+    @GetMapping("/business/{businessId}/active")
+    public ResponseEntity<List<UserDTO>> getActiveUsersByBusinessId(@PathVariable UUID businessId) {
+        return ResponseEntity.ok(userService.getActiveUsersByBusinessId(businessId));
     }
 
     @GetMapping("/role/{role}")
-    public ResponseEntity<List<User>> getUsersByRole(@PathVariable UserRole role) {
+    public ResponseEntity<List<UserDTO>> getUsersByRole(@PathVariable UserRole role) {
         return ResponseEntity.ok(userService.getUsersByRole(role));
     }
 
-    @GetMapping("/user/{userId}/role/{role}")
-    public ResponseEntity<List<User>> getUsersByBusinessIdAndRole(@PathVariable String userId, @PathVariable UserRole role) {
-        return ResponseEntity.ok(userService.getUsersByBusinessIdAndRole(userId, role));
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID id, @RequestBody UpdateUserDto user) {
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<Void> updateUserPassword(@PathVariable UUID userId, @RequestBody UpdatePasswordDTO password) {
+        userService.updateUserPassword(userId, password);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> activateUser(@PathVariable String id) {
+    public ResponseEntity<Void> activateUser(@PathVariable UUID id) {
         userService.activateUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateUser(@PathVariable String id) {
+    public ResponseEntity<Void> deactivateUser(@PathVariable UUID id) {
         userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/exists")
-    public ResponseEntity<Boolean> existsByBusinessIdAndName(@RequestParam String userId, @RequestParam String name) {
-        return ResponseEntity.ok(userService.existsByBusinessIdAndName(userId, name));
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userService.getUserByPin(request.getPin());
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+        User user = userService.getUserLogin(request);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid pin"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid user"));
         }
 
         if (!user.getIsActive()) {
