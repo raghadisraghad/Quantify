@@ -27,28 +27,11 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/actuator/health",
-                                "/api/users/login",
-                                "/api/users/register",
-                                "/api/businesses/login",
-                                "/api/businesses/register"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-//                        .anyRequest().permitAll()
+                       .anyRequest().permitAll()
                 )
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
 
         return http.build();
     }
