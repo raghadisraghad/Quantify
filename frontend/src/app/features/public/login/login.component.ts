@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AppStateService } from '../../../shared/services/app-state.service';
+import { AppStateService, BusinessInfo } from '../../../shared/services/app-state.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -86,18 +87,37 @@ import { AppStateService } from '../../../shared/services/app-state.service';
 })
 export class LoginComponent {
   private readonly appState: AppStateService = inject(AppStateService);
-  email = 'lina@northstar.example';
-  password = 'welcome';
+  private readonly auth: AuthService = inject(AuthService);
+  email = '';
+  password = '';
   remember = true;
   loading = false;
   showPassword = false;
   emailPattern = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
 
   submitLogin() {
+    if (this.loading || !this.email || !this.password) return;
     this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-      this.appState.loginBusiness();
-    }, 700);
+    this.auth.login(this.email, this.password).subscribe({
+      next: (res) => {
+        this.loading = false;
+        const business: BusinessInfo = {
+          id: res.businessId,
+          name: res.businessName,
+          slug: res.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          type: res.type,
+          owner: res.email,
+          email: res.email,
+          phone: '',
+          address: ''
+        };
+        this.appState.loginBusiness(business, res.token);
+      },
+      error: (err) => {
+        this.loading = false;
+        const msg = err.error?.error || 'Connection failed. Is the server running?';
+        this.appState.showToast(msg, 'error');
+      }
+    });
   }
 }

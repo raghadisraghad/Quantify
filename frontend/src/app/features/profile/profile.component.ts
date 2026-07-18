@@ -23,8 +23,8 @@ import { AppStateService } from '../../shared/services/app-state.service';
         </article>
         <article class="card">
           <div class="card-title">Business</div>
-          <div class="card-value">{{ session.business.name }}</div>
-          <div class="card-meta">{{ session.business.type }}</div>
+          <div class="card-value">{{ session.business?.name }}</div>
+          <div class="card-meta">{{ session.business?.type }}</div>
         </article>
       </div>
     </div>

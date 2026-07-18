@@ -29,6 +29,9 @@ public class Order {
     @Column(name = "business_id", nullable = false, columnDefinition = "UUID")
     private UUID businessId;
 
+    @Column(name = "customer_name", length = 100)
+    private String customerName;
+
     @Column(name = "order_number", nullable = false, length = 50)
     private String orderNumber;
 

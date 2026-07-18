@@ -16,6 +16,7 @@ public class OrderItemDTO {
 
     private UUID id;
     private UUID orderId;
+    private String name;
     private String recipeId;
     private Integer quantity;
     private BigDecimal unitPrice;

@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { employeeProfiles } from '../../../shared/data/mock-data';
-import { AppStateService } from '../../../shared/services/app-state.service';
+import { AppStateService, EmployeeInfo } from '../../../shared/services/app-state.service';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-pin',
@@ -11,14 +11,14 @@ import { AppStateService } from '../../../shared/services/app-state.service';
   template: `
     <div class="auth-shell">
       <div class="auth-card">
-        <div class="brand">{{ business.name }}</div>
+        <div class="brand">{{ business?.name }}</div>
         <h1>Employee PIN</h1>
         <p>Enter your 4-digit PIN to access the workspace.</p>
 
         <div class="employee-card">
-          <div class="avatar">{{ business.name.charAt(0) }}</div>
+          <div class="avatar">{{ (business?.name?.charAt(0)) || '?' }}</div>
           <div>
-            <strong>{{ business.name }}</strong>
+            <strong>{{ business?.name }}</strong>
             <span class="muted">Enter your employee PIN below</span>
           </div>
         </div>
@@ -47,7 +47,6 @@ import { AppStateService } from '../../../shared/services/app-state.service';
 
         <div class="pin-footer">
           <button class="btn-ghost" type="button" (click)="logout()">Back to Login</button>
-          <span class="pin-hint">Try 1234, 4321, 9999, 0000</span>
         </div>
       </div>
     </div>
@@ -79,12 +78,12 @@ import { AppStateService } from '../../../shared/services/app-state.service';
     `.btn-primary:disabled { opacity:.4; cursor:default; transform:none; }`,
     `.pin-footer { display:flex; justify-content:space-between; align-items:center; margin-top:.75rem; }`,
     `.btn-ghost { background:none; border:none; color:#8fb4ff; cursor:pointer; font-size:.85rem; padding:.4rem 0; transition:color .2s; }`,
-    `.btn-ghost:hover { color:#b9c7e6; }`,
-    `.pin-hint { font-size:.7rem; color:#6a7fa0; }`
+    `.btn-ghost:hover { color:#b9c7e6; }`
   ]
 })
 export class PinComponent {
   private readonly appState: AppStateService = inject(AppStateService);
+  private readonly auth: AuthService = inject(AuthService);
   pin = '';
   loading = false;
   business = this.appState.session().business;
@@ -98,17 +97,25 @@ export class PinComponent {
   }
 
   submitPin() {
-    const match = employeeProfiles.find((e) => e.pin === this.pin);
-    if (!match) {
-      this.appState.showToast('PIN not recognized. Try 1234, 4321, 9999, or 0000.', 'error');
-      this.pin = '';
-      return;
-    }
+    if (this.loading || this.pin.length < 4 || !this.business) return;
     this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-      this.appState.setEmployee(match);
-    }, 600);
+    this.auth.verifyPin(this.business.id, this.pin).subscribe({
+      next: (res) => {
+        this.loading = false;
+        const employee: EmployeeInfo = {
+          id: res.userId,
+          name: res.userName,
+          role: res.role
+        };
+        this.appState.setEmployee(employee, res.token);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.pin = '';
+        const msg = err.error?.error || 'PIN verification failed. Is the server running?';
+        this.appState.showToast(msg, 'error');
+      }
+    });
   }
 
   logout() {

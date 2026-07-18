@@ -19,6 +19,7 @@ public class OrderDTO {
 
     private UUID id;
     private UUID businessId;
+    private String customerName;
     private String orderNumber;
     private BigDecimal totalAmount;
     private OrderStatus status;

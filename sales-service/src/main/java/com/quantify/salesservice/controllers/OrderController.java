@@ -8,6 +8,8 @@ import com.quantify.salesservice.models.OrderStatus;
 import com.quantify.salesservice.services.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,15 @@ public class OrderController {
     @GetMapping("/business/{businessId}/status/{status}")
     public ResponseEntity<List<OrderDTO>> getOrdersByBusinessIdAndStatus(@PathVariable UUID businessId, @PathVariable OrderStatus status) {
         return ResponseEntity.ok(orderService.getOrdersByBusinessIdAndStatus(businessId, status));
+    }
+
+    @GetMapping("/business/{businessId}/search")
+    public ResponseEntity<Page<OrderDTO>> searchOrders(
+            @PathVariable UUID businessId,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) OrderStatus status,
+            Pageable pageable) {
+        return ResponseEntity.ok(orderService.searchOrders(businessId, q, status, pageable));
     }
 
     @PatchMapping("/{id}/status")
