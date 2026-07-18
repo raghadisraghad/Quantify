@@ -5,6 +5,7 @@ This service is built with ASP.NET Core Web API 8.0.
 ## Table of Contents
 
 - [Environment File](#environment-file)
+* [Migration](#migration)
 - [Dependencies Installation](#dependencies-installation)
 - [Development Server](#development-server)
 - [Building](#building)
@@ -21,6 +22,14 @@ cp .env.example .env
 ```
 
 Update the values in `.env` as needed.
+
+## Migration
+
+Run migration to create tables
+
+```bash
+dotnet ef database update
+```
 
 ## Dependencies Installation
 

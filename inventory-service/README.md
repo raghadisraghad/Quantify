@@ -24,7 +24,7 @@ cp .env.example .env
 
 Update the values in `.env` as needed.
 
-## Environment File
+## Migration
 
 Run migration to create tables
 
