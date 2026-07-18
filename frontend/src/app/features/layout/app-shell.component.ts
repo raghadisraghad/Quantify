@@ -99,7 +99,7 @@ const ICONS: Record<string, string> = {
             </button>
             <div>
               <div class="eyebrow">Good {{ timeOfDay }}, {{ session().employee?.name || 'User' }}</div>
-              <h1>{{ session().business.name }}</h1>
+              <h1>{{ session().business?.name }}</h1>
             </div>
           </div>
 

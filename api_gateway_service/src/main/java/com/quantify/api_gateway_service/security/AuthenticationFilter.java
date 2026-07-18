@@ -4,6 +4,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -61,7 +64,11 @@ public class AuthenticationFilter implements WebFilter {
                 .header("X-Authenticated-User", username)
                 .build();
 
-        return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("USER")));
+
+        return chain.filter(exchange.mutate().request(modifiedRequest).build())
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus status) {

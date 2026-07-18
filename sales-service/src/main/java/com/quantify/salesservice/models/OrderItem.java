@@ -28,6 +28,9 @@ public class OrderItem {
     @Column(name = "order_id", nullable = false, columnDefinition = "UUID")
     private UUID orderId;
 
+    @Column(length = 100)
+    private String name;
+
     @Column(name = "recipe_id", nullable = false, length = 100)
     private String recipeId;
 

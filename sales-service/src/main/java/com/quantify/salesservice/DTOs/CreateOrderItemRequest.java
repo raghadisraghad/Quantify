@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CreateOrderItemRequest {
 
+    private String name;
+
     @NotBlank
     private String recipeId;
 

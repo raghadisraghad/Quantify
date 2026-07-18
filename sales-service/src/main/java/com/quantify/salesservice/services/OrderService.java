@@ -5,6 +5,8 @@ import com.quantify.salesservice.DTOs.CreatePaymentRequest;
 import com.quantify.salesservice.DTOs.OrderDTO;
 import com.quantify.salesservice.DTOs.PaymentDTO;
 import com.quantify.salesservice.models.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +22,8 @@ public interface OrderService {
     List<OrderDTO> getOrdersByBusinessIdAndStatus(UUID businessId, OrderStatus status);
 
     List<OrderDTO> getAllOrders();
+
+    Page<OrderDTO> searchOrders(UUID businessId, String q, OrderStatus status, Pageable pageable);
 
     OrderDTO updateOrderStatus(UUID id, OrderStatus status);
 

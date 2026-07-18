@@ -20,6 +20,8 @@ public class CreateOrderRequest {
     @NotNull
     private UUID businessId;
 
+    private String customerName;
+
     @NotBlank
     private String orderNumber;
 

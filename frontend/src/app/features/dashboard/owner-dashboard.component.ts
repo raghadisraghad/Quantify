@@ -12,7 +12,7 @@ import { AppStateService } from '../../shared/services/app-state.service';
       <div class="dash-header">
         <div>
           <div class="eyebrow">Owner Dashboard</div>
-          <h1>{{ session().business.name }}</h1>
+          <h1>{{ session().business?.name }}</h1>
         </div>
         <div class="dash-badges">
           <span class="status-badge healthy">Business Health: Good</span>

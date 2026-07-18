@@ -5,12 +5,13 @@ import com.quantify.salesservice.models.Order;
 import com.quantify.salesservice.models.OrderItem;
 import com.quantify.salesservice.models.OrderStatus;
 import com.quantify.salesservice.models.Payment;
-import com.quantify.salesservice.models.PaymentMethod;
 import com.quantify.salesservice.models.PaymentStatus;
 import com.quantify.salesservice.repositories.OrderItemRepository;
 import com.quantify.salesservice.repositories.OrderRepository;
 import com.quantify.salesservice.repositories.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(CreateOrderRequest request) {
         Order order = Order.builder()
                 .businessId(request.getBusinessId())
+                .customerName(request.getCustomerName())
                 .orderNumber(request.getOrderNumber())
                 .totalAmount(request.getTotalAmount())
                 .status(OrderStatus.PENDING)
@@ -42,6 +44,7 @@ public class OrderServiceImpl implements OrderService {
             for (CreateOrderItemRequest itemRequest : request.getItems()) {
                 OrderItem item = OrderItem.builder()
                         .orderId(savedOrder.getId())
+                        .name(itemRequest.getName())
                         .recipeId(itemRequest.getRecipeId())
                         .quantity(itemRequest.getQuantity())
                         .unitPrice(itemRequest.getUnitPrice())
@@ -73,6 +76,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream().map(this::toDto).toList();
+    }
+
+    @Override
+    public Page<OrderDTO> searchOrders(UUID businessId, String q, OrderStatus status, Pageable pageable) {
+        return orderRepository.searchByBusinessId(businessId, q, status, pageable).map(this::toDto);
     }
 
     @Override
@@ -128,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderDTO.builder()
                 .id(order.getId())
                 .businessId(order.getBusinessId())
+                .customerName(order.getCustomerName())
                 .orderNumber(order.getOrderNumber())
                 .totalAmount(order.getTotalAmount())
                 .status(order.getStatus())
@@ -141,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderItemDTO.builder()
                 .id(item.getId())
                 .orderId(item.getOrderId())
+                .name(item.getName())
                 .recipeId(item.getRecipeId())
                 .quantity(item.getQuantity())
                 .unitPrice(item.getUnitPrice())
