@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using inventory_service;
+using procurement_service;
+using procurement_service.Repositories;
+using procurement_service.Services;
 using Steeltoe.Discovery.Eureka;
 
 DotNetEnv.Env.Load();
@@ -16,39 +18,42 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(connString));
 
-using (var scope = builder.Services.BuildServiceProvider().CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.OpenConnection();
-    Console.WriteLine("DB CONNECTED");
-}
-
 builder.Services.AddEurekaDiscoveryClient();
 builder.Services.AddControllers();
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
-app.UseAuthorization();
-app.MapControllers();
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Procurement Service API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.Run();
